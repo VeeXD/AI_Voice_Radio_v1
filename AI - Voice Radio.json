@@ -1,0 +1,394 @@
+{
+  "name": "AI - Voice Radio",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "monthsInterval": 0,
+              "triggerAtHour": 20
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -128,
+        64
+      ],
+      "id": "2204e66c-63ba-48e7-81c0-1fd0703af64a",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "maxItems": 5
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        384,
+        -112
+      ],
+      "id": "4e59f6d9-6ed4-4e5c-884b-990c56423474",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3711b40a-4d82-4ee9-b4ba-2bd0cb35e589",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "93611ead-3920-4545-b35e-114f6840832f",
+              "name": "Summary",
+              "value": "={{ $json.contentSnippet }}",
+              "type": "string"
+            },
+            {
+              "id": "49fe6aa9-6809-4a04-a50a-9fd573a50c0c",
+              "name": "published_at",
+              "value": "={{ $json.isoDate }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        -112
+      ],
+      "id": "8b3cc8b3-c013-483e-a0b9-9d20dd11443f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8985eb93-445a-4012-8b1b-eded4c84b4f1",
+              "name": "News_Script",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        -112
+      ],
+      "id": "4fd0ca5e-7145-4d3f-a708-644889a515a3",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a5be445c-20c8-4ec5-9a91-90a6db98c2c9",
+              "name": "Story_Script",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        208
+      ],
+      "id": "ac316b50-a30d-47a1-9da0-18cebf79f7e5",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        784,
+        192
+      ],
+      "id": "1a52e729-6ec5-4700-b7cf-a288e4b9fa3d",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "url": "https://feeds.bbci.co.uk/news/rss.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        -112
+      ],
+      "id": "71b1e87d-07b4-4973-81a1-8bb2d19ed5f3",
+      "name": "News Source"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are a professional radio news reporter.\n\nRewrite the following news item into a short, clear, neutral news report\nthat can be read aloud on radio.\n\nRules:\n- 3 to 4 sentences only\n- Neutral, factual tone\n- Easy spoken English\n- Do NOT add information not present\n\nNews title: {{$json.title}}\n\nNews summary: {{$json.summary}}\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 137,
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        832,
+        -112
+      ],
+      "id": "50abb3b9-1abd-48f9-a8d8-98f5cb9d1139",
+      "name": "News Script Generator",
+      "alwaysOutputData": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "31iTRq3P4iRFiTeJ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "You are a calm radio narrator.\n\nCreate a short spoken story based on the following theme:\nFamous Personalities – Life Moments\n\nPublicly known incidents\n\nMedia-discussed moments\n\nAnecdotes from biographies/interviews\n(NOT rumors presented as facts)\n\nMotivational Speeches\n\nDiscipline\n\nConsistency\n\nFailure → growth\n\nSuccess mindset\n\nStoicism & Philosophy\n\nMarcus Aurelius–style ideas\n\nControl vs acceptance\n\nCalm, reflective narration\n\nHistory\n\nIndian history\n\nAmerican history\n\nWorld history\n\nShort factual storytelling\n\nLife Concepts\n\nMeaning of success\n\nTime, purpose, suffering\n\nInteresting perspectives on life\n\nRules:\n- Duration: about 2 to 4 minutes when spoken\n- Calm, reflective tone\n- Simple, clear English\n- No exaggeration\n- No quotes from specific books\n- No religious preaching\n- End with a thoughtful takeaway\n\nThe story should feel like something people listen to while relaxing.\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 300
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "8392ed9c-a583-4c0d-9b18-35a60bfc3289",
+      "name": "Story Script Generator",
+      "credentials": {
+        "openAiApi": {
+          "id": "31iTRq3P4iRFiTeJ",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e970cd87-1c5a-45cb-bbce-56429ef91ed8",
+              "name": "AI_radio_Script",
+              "value": "=\nToday's News Headlines\n{{$json.News_Script}}\n\n---\n\nSTORY TIME:\n{{$json.Story_Script}}\n\nThanks for listening.\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1024,
+        192
+      ],
+      "id": "a4c1cee3-42b4-4f3f-bb90-1faebadc259e",
+      "name": "Radio Script Composer"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "={{$json.Story_Script}}\n",
+        "voice": "shimmer",
+        "options": {
+          "response_format": "mp3"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        1264,
+        192
+      ],
+      "id": "84c47e5a-2b6e-4dc8-8a95-6615c8d30f71",
+      "name": "Voice Synthesis",
+      "credentials": {
+        "openAiApi": {
+          "id": "31iTRq3P4iRFiTeJ",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "News Source",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Story Script Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "News Script Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Radio Script Composer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "News Source": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "News Script Generator": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Story Script Generator": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Radio Script Composer": {
+      "main": [
+        [
+          {
+            "node": "Voice Synthesis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "96396332-a1b2-4b9c-bed8-03fd8d44a9a0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1639d30dd4f9f71fbf6f4a5777ff6a840d589d1a9b4aa24ba27e35cf15295726"
+  },
+  "id": "UX-GXSeImAXQgSn57_dti",
+  "tags": []
+}
