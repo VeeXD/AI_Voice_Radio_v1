@@ -91,4 +91,4 @@ High-level workflow:
 ## 👤 Author
 
 Built by **Veekshith Sadam**  
-AI, Data & Automation Enthusiast
+Data Analyst III, AI Enthusiast.
